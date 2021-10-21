@@ -2,7 +2,7 @@ import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
 
-export default class ToggleButton extends PureComponent {
+export default class SequencerButton extends PureComponent {
   constructor(props) {
     super(props)
   }
@@ -11,7 +11,7 @@ export default class ToggleButton extends PureComponent {
     const { text, isOn, handleClick } = this.props
 
     const classes = classnames({
-      ToggleButton: true,
+      SequencerButton: true,
       active: isOn
     })
 
@@ -23,7 +23,7 @@ export default class ToggleButton extends PureComponent {
   }
 }
 
-ToggleButton.propTypes = {
+SequencerButton.propTypes = {
   // text: PropTypes.string.isRequired,
   isOn: PropTypes.bool,
   handleClick: PropTypes.func.isRequired

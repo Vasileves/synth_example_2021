@@ -10,11 +10,6 @@ export default class ToneSynth extends Component {
     super(props)
   }
 
-  // Можно спользовать обновление тут, так как
-  // componentDidUpdate() {
-  // this.updateNodeParams()
-  // }
-
   updateNodeParams = () => {
     const { node, settings } = this.props
     const { volume, detune, portamento, envelope, oscillator } = settings
@@ -56,7 +51,7 @@ export default class ToneSynth extends Component {
   }
 
   render() {
-    const { id, name, settings } = this.props
+    const { name, settings } = this.props
     const { volume, detune, portamento, envelope, oscillator } = settings
 
     const {

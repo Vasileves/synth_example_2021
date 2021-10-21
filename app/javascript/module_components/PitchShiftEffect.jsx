@@ -5,21 +5,20 @@ import Slider from '../control_components/Slider'
 import Knob from '../control_components/Knob'
 import ButtonSet from '../control_components/ButtonSet'
 
-export default class ChorusEffect extends Component {
+export default class PitchShiftEffect extends Component {
   constructor(props) {
     super(props)
   }
 
   updateNodeParams = () => {
     const { node, settings } = this.props
-    const { wet, type, frequency, delayTime, depth, spread } = settings
+    const { wet, pitch, windowSize, delayTime, feedback } = settings
 
     node.wet.value = wet
-    node.type = type
-    node.frequency.value = frequency
-    node.delayTime = delayTime
-    node.depth = depth
-    node.spread = spread
+    node.pitch = pitch
+    node.windowSize = windowSize
+    node.delayTime.value = delayTime
+    node.feedback.value = feedback
   }
 
   handlePropertyValueChange = (property, value) => {
@@ -29,13 +28,12 @@ export default class ChorusEffect extends Component {
 
   render() {
     const { name, settings } = this.props
-    const { wet, type, frequency, delayTime, depth, spread } = settings
-    const oscillatorTypes = ['sine', 'square', 'triangle', 'sawtooth']
+    const { wet, pitch, windowSize, delayTime, feedback } = settings
 
     this.updateNodeParams()
 
     return (
-      <div className="ChorusEffect">
+      <div className="PitchShiftEffect">
         <h1>{name}</h1>
 
         <Slider
@@ -48,51 +46,32 @@ export default class ChorusEffect extends Component {
           handleChange={this.handlePropertyValueChange}
         />
 
-        <ButtonSet
-          name="Type"
-          property={['type']}
-          value={type}
-          options={oscillatorTypes}
+        <Knob
+          name="Pitch"
+          property={['pitch']}
+          min={-24}
+          max={24}
+          value={pitch}
           handleChange={this.handlePropertyValueChange}
         />
 
         <Slider
-          name="Frequency"
-          property={['frequency']}
-          min={0}
-          max={100}
-          step={0.01}
-          value={frequency}
-          handleChange={this.handlePropertyValueChange}
-        />
-
-        <Slider
-          name="Delay Time"
-          property={['delayTime']}
-          min={0}
-          max={30}
-          step={1}
-          value={delayTime}
-          handleChange={this.handlePropertyValueChange}
-        />
-
-        <Slider
-          name="Depth"
-          property={['depth']}
+          name="Window Size"
+          property={['windowSize']}
           min={0}
           max={1}
           step={0.01}
-          value={depth}
+          value={windowSize}
           handleChange={this.handlePropertyValueChange}
         />
 
         <Slider
-          name="Spread"
-          property={['spread']}
+          name="Feedback"
+          property={['feedback']}
           min={0}
-          max={360}
-          step={1}
-          value={spread}
+          max={1}
+          step={0.001}
+          value={feedback}
           handleChange={this.handlePropertyValueChange}
         />
       </div>
@@ -100,7 +79,7 @@ export default class ChorusEffect extends Component {
   }
 }
 
-ChorusEffect.propTypes = {
+PitchShiftEffect.propTypes = {
   id: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
   node: PropTypes.object.isRequired,

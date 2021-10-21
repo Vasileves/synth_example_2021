@@ -1,4 +1,11 @@
 import * as Tone from 'tone'
+// import * as melodySynth from '../tunes/melody_synth'
+import * as bassSynth from '../tunes/bass_synth'
+// import * as spaceSynth from '../tunes/space_synth'
+// import * as allEffectsSynth from '../tunes/all_effects_synth'
+import * as drumSampler from '../tunes/drum_sampler'
+import * as sequencedSynth from '../tunes/sequenced_synth'
+
 import React, { PureComponent } from 'react'
 
 import WelcomeScreen from '../views/WelcomeScreen'
@@ -23,133 +30,75 @@ export default class SynthContainer extends PureComponent {
     })
   }
 
-  generateUniqId = () => {
-    return Math.floor(Math.random() * Date.now())
-  }
-
   initInstruments = () => {
-    const melodySynthSettings = {
-      volume: 0.8,
-      detune: 0,
-      portamento: 0.05,
-      envelope: {
-        attack: 0.05,
-        attackCurve: 'exponential',
-        decay: 0.2,
-        decayCurve: 'exponential',
-        sustain: 0.2,
-        release: 1.5,
-        releaseCurve: 'exponential'
-      },
-      oscillator: {
-        type: 'amtriangle',
-        modulationType: 'sine',
-        // partialCount: 0,
-        // partials: [],
-        phase: 0,
-        harmonicity: 0.5
-      }
-    }
-
-    const melodySynthChorusSettings = {
-      wet: 0.6,
-      type: 'sine',
-      frequency: 1.5,
-      delayTime: 3.5,
-      depth: 0.7,
-      spread: 180
-    }
-
-    const melodySynthChannelSettings = {
-      pan: 0,
-      volume: 0,
-      mute: false,
-      solo: false
-    }
-
-    const melodySynthNode = new Tone.Synth(melodySynthSettings)
-
-    const melodySynthChorusNode = new Tone.Chorus(
-      melodySynthChorusSettings
-    ).start()
-
-    const melodySynthChannelNode = new Tone.Channel(
-      melodySynthChannelSettings
-    ).toDestination()
-
-    melodySynthNode.chain(melodySynthChorusNode, melodySynthChannelNode)
-
-    const instruments = [
-      {
-        id: this.generateUniqId(),
-        name: 'Melody Synth',
-        type: 'ToneSynth',
-        node: melodySynthNode,
-        settings: melodySynthSettings
-      },
-      {
-        id: this.generateUniqId(),
-        name: 'Chorus',
-        type: 'Chorus',
-        node: melodySynthChorusNode,
-        settings: melodySynthChorusSettings
-      },
-      {
-        id: this.generateUniqId(),
-        name: 'Channel',
-        type: 'Channel',
-        node: melodySynthChannelNode,
-        settings: melodySynthChannelSettings
-      }
-    ]
-
-    // prettier-ignore
-    const seq = new Tone.Sequence(
-      (time, note) => {
-        melodySynthNode.triggerAttackRelease(note, 0.8, time)
-      },
-      [
-        'C4', 'E4', 'G4', 'C4', 'E4', 'G4', 'C4', 'E4', 'G4', 'C4', 'E4', 'G4',
-        'E4', 'G4', 'B3', 'E4', 'G4', 'B3', 'E4', 'G4', 'B3', 'E4', 'G4', 'B3'
-      ]
-    ).start(0)
-
+    Tone.Transport.bpm.value = 240
     Tone.Transport.start()
 
-    this.setState({
-      instruments
-    })
+    // melodySynth.part.start()
+    // bassSynth.sequention.start(0)
+    // spaceSynth.sequention.start(0)
+
+    // const sequention = allEffectsSynth.sequentions[0]().start(0)
+    // allEffectsSynth.sequentions[0].start(0)
+
+    // const sequention = drumSampler.part.start()
+
+    const instruments = [
+      // melodySynth.instrument,
+      // spaceSynth.instrument
+      // allEffectsSynth.instrument
+      drumSampler.instrument,
+      sequencedSynth.instrument,
+      bassSynth.instrument
+    ]
+
+    this.setState({ instruments })
   }
 
   handlePropertyValueChange = (id, property, value) => {
-    // Звук лагает при изменении параметров
-    // const { instruments } = this.state
-    //
-    // instruments.forEach((instrument, i) => {
-    //   if (instrument.id === id) {
-    //     const propertyLevel1 = property[0]
-    //     instrument.settings[propertyLevel1] = value
-    //   }
-    //
-    //   instruments.push(instrument)
-    // })
-
-    // Иммутабельный способ, звук не лагает
+    console.log(property, value)
     const instruments = []
 
     this.state.instruments.forEach((instrument, i) => {
-      const newInstrument = Object.assign({}, instrument)
+      const newInstrument = []
 
-      if (instrument.id === id) {
-        if (property.length === 1) {
-          const propertyName = property[0]
-          newInstrument.settings[propertyName] = value
-        } else if (property.length === 2) {
-          const scopeName = property[0]
-          const propertyName = property[1]
-          newInstrument.settings[scopeName][propertyName] = value
+      instrument.forEach((instrumentModule, i) => {
+        const newInstrumentModule = Object.assign({}, instrumentModule)
+
+        if (instrumentModule.id === id) {
+          if (property.length === 1) {
+            const propertyName = property[0]
+            newInstrumentModule.settings[propertyName] = value
+          } else if (property.length === 2) {
+            const scopeName = property[0]
+            const propertyName = property[1]
+            newInstrumentModule.settings[scopeName][propertyName] = value
+          } else if (property.length === 3) {
+            let searchedEvent
+
+            newInstrumentModule.settings.sequence.forEach((event, i) => {
+              if (
+                event.noteName === property[0] &&
+                event.time === property[1]
+              ) {
+                searchedEvent = event
+                newInstrumentModule.settings.sequence.splice(i, 1)
+              }
+            })
+
+            if (searchedEvent === undefined) {
+              newInstrumentModule.settings.sequence.push({
+                time: property[1],
+                noteName: property[0],
+                duration: '4n',
+                velocity: 1
+              })
+            }
+          }
         }
-      }
+
+        newInstrument.push(newInstrumentModule)
+      })
 
       instruments.push(newInstrument)
     })
